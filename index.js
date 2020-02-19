@@ -12,7 +12,16 @@ app.use('/', async (req, res, next) => {
     let {data} = await axios.get(
       'https://www.nycgovparks.org/bigapps/DPR_Eateries_001.json'
     )
-    res.send(data)
+    let eateryNames = data.filter(eatery => {
+      if (eatery.start_date) {
+        return eatery.start_date[3] === '2'
+      } else {
+        return false
+      }
+    })
+    eateryNames = eateryNames.map(eatery => eatery.name)
+    //eateryNames = eateryNames.filter(eatery => eatery.start_date[3] === '2')
+    res.send(eateryNames)
   } catch (error) {
     console.log(error)
   }
