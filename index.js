@@ -7,6 +7,14 @@ const app = express()
 
 app.use(bodyParser.json())
 
+const convertDateToMap = startDate => {
+  let dateMap = {}
+  dateMap.year = +startDate.slice(0, 4)
+  dateMap.month = +startDate.slice(5, 7)
+  dateMap.day = +startDate.slice(8)
+  return dateMap
+}
+
 app.use('/', async (req, res, next) => {
   try {
     let {data} = await axios.get(
@@ -14,13 +22,17 @@ app.use('/', async (req, res, next) => {
     )
     let eateryNames = data.filter(eatery => {
       if (eatery.start_date) {
-        return eatery.start_date[3] === '2'
+        let dateMap = convertDateToMap(eatery.start_date)
+        let currentDate = new Date()
+        return (
+          dateMap.year === currentDate.getFullYear() ||
+          dateMap.year === currentDate.getFullYear() - 1
+        )
       } else {
         return false
       }
     })
-    eateryNames = eateryNames.map(eatery => eatery.name)
-    //eateryNames = eateryNames.filter(eatery => eatery.start_date[3] === '2')
+    //eateryNames = eateryNames.map(eatery => eatery.name)
     res.send(eateryNames)
   } catch (error) {
     console.log(error)
