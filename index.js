@@ -32,6 +32,16 @@ app.use('/', async (req, res, next) => {
     let sidewalkCafes = await axios.get(
       'https://data.cityofnewyork.us/api/views/qcdj-rwhu/rows.json'
     )
+    let businesses = await axios.get(
+      'https://data.cityofnewyork.us/resource/w7w3-xahh.json'
+    )
+    businesses = businesses.data
+    console.log(
+      businesses.filter(business => {
+        console.log(Object.values(business))
+        return Object.values(business).includes('RESTAURANT')
+      })
+    )
     sidewalkCafes = sidewalkCafes.data.data
     eateries = eateries.filter(eatery => {
       if (eatery.start_date) {
