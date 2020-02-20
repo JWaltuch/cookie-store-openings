@@ -7,22 +7,35 @@ const app = express()
 
 app.use(bodyParser.json())
 
-const convertDateToMap = startDate => {
+const convertYDMDateToMap = date => {
   let dateMap = {}
-  dateMap.year = +startDate.slice(0, 4)
-  dateMap.month = +startDate.slice(5, 7)
-  dateMap.day = +startDate.slice(8)
+  dateMap.year = +date.slice(0, 4)
+  dateMap.month = +date.slice(5, 7)
+  dateMap.day = +date.slice(8)
+  return dateMap
+}
+
+const convertMDYDateToMap = date => {
+  let dateMap = {}
+  dateMap.month = +date.slice(0, 2)
+  dateMap.day = +date.slice(3, 5)
+  dateMap.year = +date.slice(6)
   return dateMap
 }
 
 app.use('/', async (req, res, next) => {
   try {
-    let {data} = await axios.get(
+    let eateries = await axios.get(
       'https://www.nycgovparks.org/bigapps/DPR_Eateries_001.json'
     )
-    let eateryNames = data.filter(eatery => {
+    eateries = eateries.data
+    let sidewalkCafes = await axios.get(
+      'https://data.cityofnewyork.us/api/views/qcdj-rwhu/rows.json'
+    )
+    sidewalkCafes = sidewalkCafes.data.data
+    eateries = eateries.filter(eatery => {
       if (eatery.start_date) {
-        let dateMap = convertDateToMap(eatery.start_date)
+        let dateMap = convertYDMDateToMap(eatery.start_date)
         let currentDate = new Date()
         return (
           dateMap.year === currentDate.getFullYear() ||
@@ -32,8 +45,20 @@ app.use('/', async (req, res, next) => {
         return false
       }
     })
-    //eateryNames = eateryNames.map(eatery => eatery.name)
-    res.send(eateryNames)
+    sidewalkCafes = sidewalkCafes.filter(cafe => {
+      if (cafe[cafe.length - 1]) {
+        let dateMap = convertYDMDateToMap(cafe[cafe.length - 1])
+        let currentDate = new Date()
+        return (
+          dateMap.year === currentDate.getFullYear() ||
+          dateMap.year === currentDate.getFullYear() - 1
+        )
+      } else {
+        return false
+      }
+    })
+    let cookieShops = [...eateries, ...sidewalkCafes]
+    res.send(cookieShops)
   } catch (error) {
     console.log(error)
   }
