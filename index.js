@@ -7,22 +7,6 @@ const app = express()
 
 app.use(bodyParser.json())
 
-const convertYDMDateToMap = date => {
-  let dateMap = {}
-  dateMap.year = +date.slice(0, 4)
-  dateMap.month = +date.slice(5, 7)
-  dateMap.day = +date.slice(8)
-  return dateMap
-}
-
-const convertMDYDateToMap = date => {
-  let dateMap = {}
-  dateMap.month = +date.slice(0, 2)
-  dateMap.day = +date.slice(3, 5)
-  dateMap.year = +date.slice(6)
-  return dateMap
-}
-
 app.use('/', async (req, res, next) => {
   try {
     let eateries = await axios.get(
