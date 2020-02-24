@@ -33,15 +33,10 @@ app.use('/', async (req, res, next) => {
       'https://data.cityofnewyork.us/api/views/qcdj-rwhu/rows.json'
     )
     let businesses = await axios.get(
-      'https://data.cityofnewyork.us/resource/w7w3-xahh.json'
+      "https://data.cityofnewyork.us/resource/w7w3-xahh.json?$where=business_name like '%25RESTAURANT%25'"
     )
     businesses = businesses.data
-    console.log(
-      businesses.filter(business => {
-        console.log(Object.values(business))
-        return Object.values(business).includes('RESTAURANT')
-      })
-    )
+
     sidewalkCafes = sidewalkCafes.data.data
     eateries = eateries.filter(eatery => {
       if (eatery.start_date) {
@@ -67,7 +62,7 @@ app.use('/', async (req, res, next) => {
         return false
       }
     })
-    let cookieShops = [...eateries, ...sidewalkCafes]
+    let cookieShops = [...businesses, ...eateries, ...sidewalkCafes]
     res.send(cookieShops)
   } catch (error) {
     console.log(error)
