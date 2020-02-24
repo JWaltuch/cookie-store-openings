@@ -33,7 +33,7 @@ app.use('/', async (req, res, next) => {
       'https://data.cityofnewyork.us/api/views/qcdj-rwhu/rows.json'
     )
     let businesses = await axios.get(
-      "https://data.cityofnewyork.us/resource/w7w3-xahh.json?$where=business_name like '%25RESTAURANT%25'"
+      "https://data.cityofnewyork.us/resource/w7w3-xahh.json?$where=date_extract_y(license_creation_date)>2018 AND business_name like '%25RESTAURANT%25'"
     )
     businesses = businesses.data
 
